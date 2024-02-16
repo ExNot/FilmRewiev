@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Film Application</title>
+
+
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Director</th>
+                <th>Release Date</th>
+                <th>Details</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr th:each="film : ${films}">
+            <td th:text="${film.id}"></td>
+            <td th:text="${film.name}"></td>
+            <td th:text="${film.director}"></td>
+            <td th:text="${film.releaseDate}"></td>
+            <td>
+                <a data-th-href="@{/films/{id}(id=${film.id})}">Info</a>
+
+                <form data-th-action="@{/films/delete/{id}(id=${film.id})}" method="post">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit">Delete</button>
+                </form>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a href="/films/add">add new film</a>
+
+
+</div>
+
+</body>
+</html>
