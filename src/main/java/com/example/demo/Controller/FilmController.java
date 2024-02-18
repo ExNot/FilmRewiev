@@ -23,6 +23,7 @@ public class FilmController {
     public String filmList(Model model){
         List<Film> films = filmService.getAllFilms();
         model.addAttribute("films", films);
+        System.out.println(model.asMap());
         return "FilmTemplates/film-list";
     }
     @GetMapping("/{id}")

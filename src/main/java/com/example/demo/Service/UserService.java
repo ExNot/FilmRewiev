@@ -24,7 +24,7 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public boolean authenticateUser(String username, String password){
+    /*public boolean authenticateUser(String username, String password){
         Optional<User> userOptional = userRepository.findByUsername(username);
 
         if (userOptional.isPresent()){
@@ -33,6 +33,6 @@ public class UserService {
         } else{
             return false;
         }
-    }
+    }*/
 
 }

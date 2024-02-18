@@ -39,10 +39,9 @@
 </div>-->
 
 <!--<div id="header" th:unless="${#authentication == null or #authentication.anonymous}">-->
-<div id="header" th:if="${#authentication != null and #authentication.name} != 'anon'">
-    <div th:text="${#authentication} ? ${#authentication.principal.id} : 'anon'"></div>
 
-
+<!--<div id="header" th:if="${session.loggedIn}">-->
+<div id="header">
 
     <!-- Header içeriği -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -74,13 +73,14 @@
 
 <div layout:fragment="content">
     <!-- Kullanıcı giriş yapmışsa -->
-    <div th:if="${#authorization.expression('isAuthenticated()')}">
-
+    <!--<div th:if="${#authorization.expression('isAuthenticated()')}">--><div>
+        <span>HEEEY</span>
         <a th:href="@{/logout}">Logout</a>
         <!-- Buraya giriş yapmış kullanıcıya özel içerikleri ekleyebilirsiniz -->
     </div>
     <!-- Kullanıcı giriş yapmamışsa -->
     <div th:unless="${#authorization.expression('isAuthenticated()')}">
+        <SPAN>HEEEY</SPAN>
         <!-- Buraya giriş yapmamış kullanıcıya özel içerikleri ekleyebilirsiniz -->
         <a th:href="@{/login}">Login</a>
         <a th:href="@{/register}">Register</a>
