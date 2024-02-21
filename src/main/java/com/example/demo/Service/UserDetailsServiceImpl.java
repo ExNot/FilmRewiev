@@ -19,7 +19,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     public UserDetailsServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -28,11 +27,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        System.out.println(user.getPPUrl());
-        return org.springframework.security.core.userdetails.User.builder()
+
+        /*return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(passwordEncoder.encode(user.getPassword()))
-                .build();
+                .build();*/
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return new CustomUserDetails(user);
     }
 
 

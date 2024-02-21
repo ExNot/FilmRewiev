@@ -2,6 +2,7 @@ package com.example.demo.Controller;
 
 import com.example.demo.Model.Film;
 import com.example.demo.Model.User;
+import com.example.demo.Service.CustomUserDetails;
 import com.example.demo.Service.FilmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,9 +31,10 @@ public class FilmController {
         List<Film> films = filmService.getAllFilms();
         model.addAttribute("films", films);
 
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-
+        /*CustomUserDetails customUserDetails =(CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        model.addAttribute("ppUrl", customUserDetails.getPPUrl());
+        model.addAttribute("userId", customUserDetails.getId());
+        model.addAttribute("username", customUserDetails.getUsername());*/
         return "FilmTemplates/film-list";
     }
     @GetMapping("/{id}")
