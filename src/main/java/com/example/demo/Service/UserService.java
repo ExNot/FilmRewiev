@@ -23,6 +23,9 @@ public class UserService {
     public Optional<User> getUserById(Long id){
         return userRepository.findById(id);
     }
+    public Optional<User> getUserByUserName(String userName){
+        return userRepository.findByUsername(userName);
+    }
 
     /*public boolean authenticateUser(String username, String password){
         Optional<User> userOptional = userRepository.findByUsername(username);

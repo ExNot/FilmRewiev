@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org"
+<html lang="en" xlmns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org" xmlns:xlmns="http://www.w3.org/1999/xhtml"
       xmlns:sec="http://www.w3.org/1999/xhtml">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,84 +11,61 @@
 </head>
 <body>
 
-<!--<div id="header" th:unless="${#authentication == null or #authentication.anonymous}">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="#">My App</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="http://localhost:8080/films">Home</a>
-                    </li>
-                    <li class="nav-item" th:if="${#authentication.isAuthenticated()}">
-                        <a class="nav-link" th:href="@{'/user/' + ${#authentication.principal.id}}" >User</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Services</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contact</a>
-                    </li>
-                </ul>
+<header>
+    <div class="navbar navbar-inverse navbar-fixed-top" th:fragment="header">
+        <nav sec:authorize="isAuthenticated()" class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container">
+                <a class="navbar-brand" href="#">My App</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+
+
+
+
+
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="http://localhost:8080/films">Home</a>
+                        </li>
+
+
+                        <li class="nav-item drowdown">
+
+                            <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <img th:src="@{${#authentication.principal.getPPUrl()}}" alt="Profile Picture" class="profile-image rounded-circle" width="32" height="32">
+                                <!--<img th:src="@{'${#authentication.principal.username}'}" alt="Profile Picture" class="profile-image rounded-circle" width="32" height="32">-->
+
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                <li><a class="dropdown-item" th:href="@{'/user/' + ${#authentication.principal.username}}">Profile</a></li>
+                                <li><a class="dropdown-item" href="http://localhost:8080/user/logout">Logout</a></li>
+                            </ul>
+
+
+                        </li>
+
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </div>
+</header>
 
-</div>-->
 
-<!--<div id="header" th:unless="${#authentication == null or #authentication.anonymous}">-->
-
-<!--<div id="header" th:if="${session.loggedIn}">-->
-<div id="header">
-
-    <!-- Header içeriği -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="#">My App</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="http://localhost:8080/films">Home</a>
-                    </li>
-                    <!--<li class="nav-item">
-                        <a class="nav-link" th:href="@{'/user/' + ${#authentication.principal.id}}" >User</a>
-                    </li>-->
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Services</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contact</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-</div>
 
 <div layout:fragment="content">
-    <!-- Kullanıcı giriş yapmışsa -->
-    <!--<div th:if="${#authorization.expression('isAuthenticated()')}">--><div>
-        <span>HEEEY</span>
-        <a th:href="@{/logout}">Logout</a>
-        <!-- Buraya giriş yapmış kullanıcıya özel içerikleri ekleyebilirsiniz -->
-    </div>
-    <!-- Kullanıcı giriş yapmamışsa -->
-    <div th:unless="${#authorization.expression('isAuthenticated()')}">
-        <SPAN>HEEEY</SPAN>
-        <!-- Buraya giriş yapmamış kullanıcıya özel içerikleri ekleyebilirsiniz -->
-        <a th:href="@{/login}">Login</a>
-        <a th:href="@{/register}">Register</a>
-    </div>
-    <!-- Ortak içerikleri ekleyebilirsiniz -->
+
+
 </div>
+
+
+
+
 
 <footer class="border-top footer text-muted">
     <div class="container">
@@ -94,7 +73,11 @@
     </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+
 </body>
 </html>
+
 
 

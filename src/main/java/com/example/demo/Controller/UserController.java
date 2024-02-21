@@ -22,9 +22,9 @@ public class UserController {
     @Autowired
     private HttpSession session;
 
-    @GetMapping("/{id}")
-    public String userInfo(@PathVariable Long id, Model model){
-        Optional<User> user = userService.getUserById(id);
+    @GetMapping("/{username}")
+    public String userInfo(@PathVariable String username, Model model){
+        Optional<User> user = userService.getUserByUserName(username);
         user.ifPresent(value -> model.addAttribute("user", value));
         return "UserTemplates/user-info";
     }

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="layout" xmlns:th="http://www.w3.org/1999/xhtml">
+      layout:decorate="layout" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -10,6 +10,7 @@
 </head>
 
 <body>
+
 <div layout:fragment="content">
     <h2>Login</h2>
     <hr/>
@@ -35,9 +36,9 @@
 
         </div>
     </div>
-
-    <div th:replace="UserTemplates/footer :: footer"></div>
 </div>
+
+
 </body>
 
 </html>

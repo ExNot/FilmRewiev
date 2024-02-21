@@ -1,8 +1,12 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Model.Film;
+import com.example.demo.Model.User;
 import com.example.demo.Service.FilmService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +18,8 @@ import java.util.Optional;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
@@ -23,7 +29,10 @@ public class FilmController {
     public String filmList(Model model){
         List<Film> films = filmService.getAllFilms();
         model.addAttribute("films", films);
-        System.out.println(model.asMap());
+
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+
         return "FilmTemplates/film-list";
     }
     @GetMapping("/{id}")

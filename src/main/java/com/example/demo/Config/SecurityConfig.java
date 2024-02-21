@@ -1,8 +1,8 @@
 package com.example.demo.Config;
 
 import com.example.demo.Repository.UserRepository;
-import com.example.demo.Service.UserDetailsServiceImpl;
 import com.example.demo.Service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,10 +22,21 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+/*    @Bean
+    public UserDetailsService userDetailsService(UserRepository userRepository, PasswordEncoder passwordEncoder){
+        return new UserDetailsServiceImpl(userRepository, passwordEncoder);
+    }*/
 
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository, PasswordEncoder passwordEncoder){
-        return new UserDetailsServiceImpl(userRepository, passwordEncoder);
+        return new UserDetailsService() {
+
+            @Override
+            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+                return null;
+            }
+
+        };
     }
 
     @Bean
@@ -39,8 +51,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE).authenticated()
 
                 )
+                .logout((logout) -> logout.logoutUrl("/user/logout").logoutSuccessUrl("/user/login"))
                 .formLogin(form -> form
                         .loginPage("/user/login")
+                                .defaultSuccessUrl("/films", true)
                                 .permitAll()
                         )
 
