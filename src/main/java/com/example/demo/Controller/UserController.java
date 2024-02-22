@@ -1,9 +1,11 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Model.User;
+import com.example.demo.Service.CustomUserDetails;
 import com.example.demo.Service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +27,16 @@ public class UserController {
     @GetMapping("/{username}")
     public String userInfo(@PathVariable String username, Model model){
         Optional<User> user = userService.getUserByUserName(username);
-        user.ifPresent(value -> model.addAttribute("user", value));
+        if (user.isPresent()){
+            CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String currentUsername = customUserDetails.getUsername();
+            if (user.get().getUsername().equals(currentUsername)){
+                user.ifPresent(value -> model.addAttribute("user", value));
+            }else {
+                model.addAttribute("warningMessage", "You are trying to view another user's profile !!!!!");
+            }
+        }
+
         return "UserTemplates/user-info";
     }
 
@@ -68,6 +79,28 @@ public class UserController {
             model.addAttribute("loggedIn", true);
             return "redirect:/films";
 
+    }
+
+
+    @PostMapping("/updateProfilePhoto")
+    public String updateProfilePhoto(@RequestParam("newPPUrl") String newPPUrl) {
+
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> user = userService.getUserByUserName(userDetails.getUsername());
+        if (user.isPresent()) {
+
+            User currentUser = user.get();
+            currentUser.setPPUrl(newPPUrl);
+            userService.saveUser(currentUser);
+
+            CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            customUserDetails.setPPUrl(newPPUrl);
+
+            return "redirect:/films";
+        }
+
+        // Kullanıcı bulunamazsa eroor döndür
+        return "ERROR NOT FOUND USER";
     }
 
 

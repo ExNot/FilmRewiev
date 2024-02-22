@@ -19,6 +19,7 @@ public class CustomUserDetails implements UserDetails {
     public Long getId(){
         return user.getId();
     }
+    public void setPPUrl(String ppUrl){this.user.setPPUrl(ppUrl);}
 
 
     @Override
