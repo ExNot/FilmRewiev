@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -62,12 +63,18 @@ public class FilmService {
 
 
 
+    private Document fetchIMDBDocument(String filmTitle) throws IOException {
+        String url = "https://www.imdb.com/find/?s==tt&q=" + filmTitle + "&ref=nv%20srsm";
+        return Jsoup.connect(url).timeout(10 * 1000).get();
+    }
+
+
     public void fetchAndAddMovies() throws IOException, InterruptedException {
         List<Film> filmsFromApi = fetchFilmFromApi();
         List<Film> existingFilms = filmRepository.findAll();
         for (Film film : filmsFromApi){
             boolean existInDatabase = existingFilms.stream()
-                            .anyMatch(existingFilm -> existingFilm.getName().equals(film.getName()));
+                    .anyMatch(existingFilm -> existingFilm.getName().equals(film.getName()));
             if (!existInDatabase){
                 filmRepository.save(film);
             }
@@ -104,45 +111,59 @@ public class FilmService {
                 film.setReleaseDate(Year.of(Integer.parseInt(filmNode.path("release_date").asText().substring(0,4))));
                 film.setIMDBRating(fetchRatingFromIMDB(filmNode.path("title").asText()));
                 film.setDescription(filmNode.path("overview").asText());
-
+                film.setImgUrl("https://image.tmdb.org/t/p/w500" + filmNode.path("poster_path").asText());
                 filmList.add(film);
+                System.out.println("https://image.tmdb.org/t/p/w500" + filmNode.path("poster_path").asText());
             }
         }
         return filmList;
     }
 
     private String fetchDirectorFromIMDB(String filmTitle) throws IOException {
-        String url = "https://www.imdb.com/find/?s==tt&q=" + filmTitle + "&ref=nv%20srsm";
-        Document document = Jsoup.connect(url).get();
+        try {
+            Document document = fetchIMDBDocument(filmTitle);
 
-        Element filmLink = document.select("a.ipc-metadata-list-summary-item__t").first();
-        if (filmLink !=null){
-            String  filmUrl ="https://www.imdb.com" + filmLink.attr("href");
-            Document filmDocument =  Jsoup.connect(filmUrl).get();
+            Element filmLink = document.select("a.ipc-metadata-list-summary-item__t").first();
+            if (filmLink != null) {
+                String filmUrl = "https://www.imdb.com" + filmLink.attr("href");
+                Document filmDocument = Jsoup.connect(filmUrl).timeout(10 * 1000).get();
 
-            Element directorElement =filmDocument.select("a.ipc-metadata-list-item__list-content-item").first();
-            if (directorElement != null){
-                return directorElement.text();
+                Element directorElement = filmDocument.select("a.ipc-metadata-list-item__list-content-item").first();
+                if (directorElement != null) {
+                    return directorElement.text();
+                }
             }
-        }
+        }catch (SocketTimeoutException e){
+            e.printStackTrace();
             return null;
+        }
+
+
+        return null;
     }
 
     private Double fetchRatingFromIMDB(String filmTitle) throws IOException {
-        String url = "https://www.imdb.com/find/?s==tt&q=" + filmTitle + "&ref=nv%20srsm";
-        Document doc = Jsoup.connect(url).get();
 
-        Element filmLink = doc.select("a.ipc-metadata-list-summary-item__t").first();
-        if (filmLink !=null){
-            String filmUrl = "https://www.imdb.com" + filmLink.attr("href");
-            Document filmDocument = Jsoup.connect(filmUrl).get();
+        try {
+            Document document = fetchIMDBDocument(filmTitle);
 
-            Element ratingElement = filmDocument.select("span.sc-bde20123-1.cMEQkK").first();
-            if (ratingElement != null){
-                return Double.parseDouble(ratingElement.text());
+            Element filmLink = document.select("a.ipc-metadata-list-summary-item__t").first();
+            if (filmLink != null) {
+                String filmUrl = "https://www.imdb.com" + filmLink.attr("href");
+                Document filmDocument = Jsoup.connect(filmUrl).timeout(10 * 1000).get();
+
+                Element ratingElement = filmDocument.select("span.sc-bde20123-1.cMEQkK").first();
+                if (ratingElement != null) {
+                    return Double.parseDouble(ratingElement.text());
+                }
             }
+
+            return null;
+        }catch (SocketTimeoutException e){
+            e.printStackTrace();
+            return null;
         }
-        return null;
+
     }
 
     @Transactional
@@ -166,8 +187,11 @@ public class FilmService {
             }
 
         }
+
     }
+
 }
+
 
 
 

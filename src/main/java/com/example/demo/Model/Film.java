@@ -17,11 +17,19 @@ public class Film {
     private Year releaseDate;
     private String description;
     private Double IMDBRating;
+    private String imgUrl;
     @OneToMany(mappedBy = "film")
     private List<UserRating> userRatings;
 
 
 
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
 
     public List<UserRating> getUserRatings() {
         return userRatings;

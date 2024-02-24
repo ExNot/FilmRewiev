@@ -1,6 +1,7 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Model.Film;
+import com.example.demo.Model.Relation.UserRating;
 import com.example.demo.Repository.UserRatingRepository;
 import com.example.demo.Service.CustomUserDetails;
 import com.example.demo.Service.FilmService;
@@ -27,6 +28,11 @@ public class FilmController {
     @GetMapping
     public String filmList(Model model) throws IOException {
         List<Film> films = filmService.getAllFilms();
+
+
+
+
+
         model.addAttribute("films", films);
         return "FilmTemplates/film-list";
     }
@@ -37,7 +43,15 @@ public class FilmController {
 
         //SEND PREVIOUS STAR COUNT TO HTML!
         CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        model.addAttribute("filmRating", userRatingRepository.findByUser_IdAndFilm_Id(customUserDetails.getId(), id).getRating());
+        UserRating userRating = userRatingRepository.findByUser_IdAndFilm_Id(customUserDetails.getId(), id);
+        if (userRating != null){
+            model.addAttribute("filmRating", userRatingRepository.findByUser_IdAndFilm_Id(customUserDetails.getId(), id).getRating());
+        }
+        else{
+            model.addAttribute("filmRating", 0);
+        }
+
+
 
         return "FilmTemplates/film-detail";
     }
