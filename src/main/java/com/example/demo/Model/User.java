@@ -1,9 +1,9 @@
 package com.example.demo.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.demo.Model.Relation.UserRating;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class User {
@@ -13,6 +13,17 @@ public class User {
     private String username;
     private String password;
     private String PPUrl;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserRating> userRatings;
+
+    public List<UserRating> getUserRatings() {
+        return userRatings;
+    }
+
+    public void setUserRatings(List<UserRating> userRatings) {
+        this.userRatings = userRatings;
+    }
 
     public String getUsername() {
         return username;

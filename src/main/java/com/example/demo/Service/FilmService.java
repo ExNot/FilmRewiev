@@ -1,14 +1,19 @@
 package com.example.demo.Service;
 
 import com.example.demo.Model.Film;
+import com.example.demo.Model.Relation.UserRating;
 import com.example.demo.Repository.FilmRepository;
+import com.example.demo.Repository.UserRatingRepository;
+import com.example.demo.Repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import jakarta.transaction.Transactional;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,14 +27,22 @@ import java.util.List;
 import java.util.Optional;
 
 
+
+
 @Service
 public class FilmService {
     @Autowired
     private final FilmRepository filmRepository;
+    @Autowired
+    private final UserRepository userRepository;
+    @Autowired
+    private final UserRatingRepository userRatingRepository;
 
 
-    public FilmService(FilmRepository filmRepository) {
+    public FilmService(FilmRepository filmRepository, UserRepository userRepository, UserRatingRepository userRatingRepository) {
         this.filmRepository = filmRepository;
+        this.userRepository = userRepository;
+        this.userRatingRepository = userRatingRepository;
     }
 
     public List<Film> getAllFilms(){
@@ -89,7 +102,9 @@ public class FilmService {
                 film.setName(filmNode.path("title").asText());
                 film.setDirector(fetchDirectorFromIMDB(filmNode.path("title").asText()));
                 film.setReleaseDate(Year.of(Integer.parseInt(filmNode.path("release_date").asText().substring(0,4))));
+                film.setIMDBRating(fetchRatingFromIMDB(filmNode.path("title").asText()));
                 film.setDescription(filmNode.path("overview").asText());
+
                 filmList.add(film);
             }
         }
@@ -111,6 +126,46 @@ public class FilmService {
             }
         }
             return null;
+    }
+
+    private Double fetchRatingFromIMDB(String filmTitle) throws IOException {
+        String url = "https://www.imdb.com/find/?s==tt&q=" + filmTitle + "&ref=nv%20srsm";
+        Document doc = Jsoup.connect(url).get();
+
+        Element filmLink = doc.select("a.ipc-metadata-list-summary-item__t").first();
+        if (filmLink !=null){
+            String filmUrl = "https://www.imdb.com" + filmLink.attr("href");
+            Document filmDocument = Jsoup.connect(filmUrl).get();
+
+            Element ratingElement = filmDocument.select("span.sc-bde20123-1.cMEQkK").first();
+            if (ratingElement != null){
+                return Double.parseDouble(ratingElement.text());
+            }
+        }
+        return null;
+    }
+
+    @Transactional
+    public void rateFilm(Long filmId, double rating){
+        Optional<Film> optionalFilm = filmRepository.findById(filmId);
+        if (optionalFilm.isPresent()){
+            Film film = optionalFilm.get();
+
+            CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            UserRating existingRating = userRatingRepository.findByUser_IdAndFilm_Id(customUserDetails.getId(), filmId);
+
+            if (existingRating != null){
+                existingRating.setRating(rating);
+                userRatingRepository.save(existingRating);
+            } else{
+                UserRating ratingObj = new UserRating();
+                ratingObj.setUser(userRepository.findByUsername(customUserDetails.getUsername()).get());
+                ratingObj.setFilm(film);
+                ratingObj.setRating(rating);
+                userRatingRepository.save(ratingObj);
+            }
+
+        }
     }
 }
 

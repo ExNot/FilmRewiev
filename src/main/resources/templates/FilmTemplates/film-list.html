@@ -20,7 +20,7 @@
                 <th>Name</th>
                 <th>Director</th>
                 <th>Release Date</th>
-                <th>Details</th>
+                <th>IMDB Rating</th>
                 <th></th>
             </tr>
         </thead>
@@ -30,6 +30,7 @@
             <td th:text="${film.name}"></td>
             <td th:text="${film.director}"></td>
             <td th:text="${film.releaseDate}"></td>
+            <td th:text="${film.IMDBRating}"></td>
             <td>
                 <a data-th-href="@{/films/{id}(id=${film.id})}">Info</a>
 

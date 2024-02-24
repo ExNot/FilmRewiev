@@ -1,11 +1,10 @@
 package com.example.demo.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.demo.Model.Relation.UserRating;
+import jakarta.persistence.*;
 
 import java.time.Year;
+import java.util.List;
 
 @Entity
 public class Film {
@@ -17,6 +16,28 @@ public class Film {
     private String director;
     private Year releaseDate;
     private String description;
+    private Double IMDBRating;
+    @OneToMany(mappedBy = "film")
+    private List<UserRating> userRatings;
+
+
+
+
+    public List<UserRating> getUserRatings() {
+        return userRatings;
+    }
+
+    public void setUserRatings(List<UserRating> userRatings) {
+        this.userRatings = userRatings;
+    }
+
+    public Double getIMDBRating() {
+        return IMDBRating;
+    }
+
+    public void setIMDBRating(Double IMDBRating) {
+        this.IMDBRating = IMDBRating;
+    }
 
     public long getId() {
         return id;
