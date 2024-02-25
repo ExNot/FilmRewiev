@@ -8,17 +8,26 @@ import com.example.demo.Repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import jakarta.transaction.Transactional;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -26,6 +35,7 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 
 
 
@@ -90,10 +100,10 @@ public class FilmService {
                 .build();
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-        return convertJsonToFilmDTOList(response.body());
+        return convertJsonToFilmList(response.body());
     }
 
-    private List<Film> convertJsonToFilmDTOList(String json) throws IOException {
+    private List<Film> convertJsonToFilmList(String json) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode =objectMapper.readTree(json);
 
@@ -105,9 +115,13 @@ public class FilmService {
             for (JsonNode filmNode : resultsArray){
                 Film film = new Film();
 
+                if (filmNode.path("title").asText().equals("See company contact information")){
+
+                }
+
                 film.setId(filmNode.path("id").asLong());
                 film.setName(filmNode.path("title").asText());
-                film.setDirector(fetchDirectorFromIMDB(filmNode.path("title").asText()));
+                film.setDirector(fetchDirectorFromAPI(filmNode.path("id").asInt()));
                 film.setReleaseDate(Year.of(Integer.parseInt(filmNode.path("release_date").asText().substring(0,4))));
                 film.setIMDBRating(fetchRatingFromIMDB(filmNode.path("title").asText()));
                 film.setDescription(filmNode.path("overview").asText());
@@ -119,7 +133,11 @@ public class FilmService {
         return filmList;
     }
 
-    private String fetchDirectorFromIMDB(String filmTitle) throws IOException {
+
+
+
+
+    /*private String fetchDirectorFromIMDB(String filmTitle) throws IOException {
         try {
             Document document = fetchIMDBDocument(filmTitle);
 
@@ -129,6 +147,7 @@ public class FilmService {
                 Document filmDocument = Jsoup.connect(filmUrl).timeout(10 * 1000).get();
 
                 Element directorElement = filmDocument.select("a.ipc-metadata-list-item__list-content-item").first();
+
                 if (directorElement != null) {
                     return directorElement.text();
                 }
@@ -140,7 +159,59 @@ public class FilmService {
 
 
         return null;
+    }*/
+    private String fetchDirectorFromAPI(int movieId) throws IOException {
+        try {
+
+            String apiKey = "789f2c54abccd9b26fa81512c8717c49";
+
+            String apiUrl = "https://api.themoviedb.org/3/movie/" + movieId + "/credits?api_key=" + apiKey;
+            URL url = new URL(apiUrl);
+
+            // Creating the HttpURLConnection
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            // Reading the response
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+
+                reader.close();
+
+
+                JsonElement jsonElement = JsonParser.parseString(response.toString());
+                JsonObject jsonObject = jsonElement.getAsJsonObject();
+                JsonArray crewArray = jsonObject.getAsJsonArray("crew");
+
+
+
+                for (JsonElement crewMember : crewArray) {
+                    JsonObject crewObject = crewMember.getAsJsonObject();
+                    String job = crewObject.get("job").getAsString();
+
+                    if ("Director".equals(job)) {
+                        String directorName = crewObject.get("name").getAsString();
+                        return directorName;
+                    }
+                }
+            } else {
+                System.out.println("Error: " + responseCode);
+            }
+
+            connection.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
+
 
     private Double fetchRatingFromIMDB(String filmTitle) throws IOException {
 
@@ -166,6 +237,7 @@ public class FilmService {
 
     }
 
+
     @Transactional
     public void rateFilm(Long filmId, double rating){
         Optional<Film> optionalFilm = filmRepository.findById(filmId);
@@ -174,7 +246,6 @@ public class FilmService {
 
             CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             UserRating existingRating = userRatingRepository.findByUser_IdAndFilm_Id(customUserDetails.getId(), filmId);
-
             if (existingRating != null){
                 existingRating.setRating(rating);
                 userRatingRepository.save(existingRating);
