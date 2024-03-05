@@ -34,11 +34,12 @@
             <td th:text="${film.releaseDate}"></td>
             <td th:text="${film.IMDBRating}"></td>
             <td>
-                <a data-th-href="@{/films/{id}(id=${film.id})}">Info</a>
+
+                <a class="btn btn-outline-primary"data-th-href="@{/films/{id}(id=${film.id})}">Info</a>
 
                 <form data-th-action="@{/films/delete/{id}(id=${film.id})}" method="post">
                     <input type="hidden" name="_method" value="DELETE">
-                    <button type="submit">Delete</button>
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
                 </form>
 
             </td>

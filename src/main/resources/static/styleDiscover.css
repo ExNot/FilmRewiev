@@ -1,0 +1,19 @@
+.discover-container {
+    text-align: center;
+}
+
+
+.film-list-container {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.film-card {
+    display: inline-block;
+    margin-right: 20px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.film-card:hover {
+    transform: scale(1.1);
+}

@@ -132,11 +132,6 @@ public class FilmService {
         }
         return filmList;
     }
-
-
-
-
-
     /*private String fetchDirectorFromIMDB(String filmTitle) throws IOException {
         try {
             Document document = fetchIMDBDocument(filmTitle);
@@ -211,8 +206,6 @@ public class FilmService {
         }
         return null;
     }
-
-
     private Double fetchRatingFromIMDB(String filmTitle) throws IOException {
 
         try {
@@ -236,8 +229,6 @@ public class FilmService {
         }
 
     }
-
-
     @Transactional
     public void rateFilm(Long filmId, double rating){
         Optional<Film> optionalFilm = filmRepository.findById(filmId);
@@ -260,6 +251,11 @@ public class FilmService {
         }
 
     }
+
+
+
+
+
 
 }
 

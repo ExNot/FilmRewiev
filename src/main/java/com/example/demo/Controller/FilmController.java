@@ -28,14 +28,16 @@ public class FilmController {
     @GetMapping
     public String filmList(Model model) throws IOException {
         List<Film> films = filmService.getAllFilms();
-
-
-
-
-
         model.addAttribute("films", films);
         return "FilmTemplates/film-list";
     }
+
+    @GetMapping("/discover")
+    public String index(){
+        return "discover";
+    }
+
+
     @GetMapping("/{id}")
     public String filmDetail(@PathVariable Long id, Model model){
         Optional<Film> film = filmService.getFilmById(id);
