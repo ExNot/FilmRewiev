@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html lang="en"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -46,5 +47,71 @@
 
 
 
+</body>
+</html>-->
+
+
+
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Info</title>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <div th:if="${user}">
+        <dl class="row">
+            <dt class="col-sm-2">Username:</dt>
+            <dd class="col-sm-10">
+                <span th:text="${user.username}"></span>
+            </dd>
+        </dl>
+
+        <a href="/films">Films</a>
+
+        <div th:if="${user.userRatings}">
+            <h3>Rated Films:</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Rating</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="userRating : ${userRatings}">
+                    <td th:text="${userRating.film.name}"></td>
+                    <td th:text="${userRating.rating}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <form id="profilePictureForm" action="/user/updateProfilePhoto" method="post">
+            <label for="newPPUrl">New Profile Photo URL:</label>
+            <input type="text" id="newPPUrl" name="newPPUrl" />
+            <button type="submit" id="updateProfilePhotoButton">Update Profile Photo</button>
+        </form>
+    </div>
+
+    <div th:unless="${user}" class="alert alert-danger" role="alert">
+        <p>User not found</p>
+    </div>
+
+    <div th:if="${warningMessage}" class="alert alert-warning" role="alert">
+        <p th:text="${warningMessage}"></p>
+    </div>
+
+    <button id="testButton">Test jQuery</button>
+
+</div>
 </body>
 </html>
