@@ -3,10 +3,15 @@ body {
   background-color: #9B2335 !important;
 }
 
-
-thead, tbody {
-  background-color: transparent;
+.navbar-light {
+    background-color: transparent !important;
 }
+
+td, th {
+    background-color: transparent !important;
+}
+
+
 
 .discover-container {
     text-align: center;
