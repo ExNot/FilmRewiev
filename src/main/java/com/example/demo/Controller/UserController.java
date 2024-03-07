@@ -45,18 +45,6 @@ public class UserController {
                         .sorted(Comparator.comparing(UserRating::getRating).reversed())
                                 .collect(Collectors.toList());
 
-                /*List<Film> ratedFilms = userRatings.stream()
-                        .map(userRating -> userRating.getFilm())
-                        .collect(Collectors.toList());*/
-
-
-               /* List<Film> sortedFilms = ratedFilms.stream()
-                                .sorted(Comparator.comparing(film -> film.getUserRatings().size(), Comparator.reverseOrder()))
-                                        .collect(Collectors.toList());
-
-                for (int i = 0; i< sortedFilms.size(); i++){
-                    System.out.println(sortedFilms.get(i).getUserRatings());
-                }*/
                 model.addAttribute("userRatings", userRatings);
                 user.ifPresent(value -> model.addAttribute("user", value));
 

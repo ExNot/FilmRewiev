@@ -1,3 +1,17 @@
+#newPPUrl {
+  width: 50%;
+}
+
+
+#loginCenter {
+       display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: stretch;
+          min-height: 100vh;
+          width: 80%;
+          margin: 0 auto;
+}
 
 body {
   background-color: #9B2335 !important;
