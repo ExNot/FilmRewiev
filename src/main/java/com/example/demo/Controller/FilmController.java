@@ -2,6 +2,7 @@ package com.example.demo.Controller;
 
 import com.example.demo.Model.Film;
 import com.example.demo.Model.Relation.UserRating;
+import com.example.demo.Repository.FilmRepository;
 import com.example.demo.Repository.UserRatingRepository;
 import com.example.demo.Service.CustomUserDetails;
 import com.example.demo.Service.FilmService;
@@ -63,6 +64,7 @@ public class FilmController {
         model.addAttribute("newFilm", new Film());
         return "FilmTemplates/film-add";
     }
+
     @PostMapping("/add")
     public String addFilm(@ModelAttribute Film newFilm){
         filmService.saveFilm(newFilm);
@@ -81,6 +83,15 @@ public class FilmController {
         filmService.rateFilm(filmId, stars);
         return "redirect:/films";
     }
+
+    @GetMapping("/search")
+    @ResponseBody
+    public List<String> autocomplate(@RequestParam String query){
+        List<String> filmNames = filmService.searchFilms(query);
+        return filmNames;
+    }
+
+
 }
 
 

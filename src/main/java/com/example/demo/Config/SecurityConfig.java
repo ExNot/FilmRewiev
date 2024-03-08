@@ -37,9 +37,11 @@ public class SecurityConfig {
                         .requestMatchers("/user/login").permitAll()
                         .requestMatchers("/user/register").permitAll()
                         .requestMatchers("/styleDiscover.css").permitAll()
+                        .requestMatchers("/static/scriptAutorecommend.js").permitAll()
                         .requestMatchers(HttpMethod.GET).authenticated()
                         .requestMatchers(HttpMethod.POST).authenticated()
                         .requestMatchers(HttpMethod.DELETE).authenticated()
+
 
                 )
                 .logout((logout) -> logout.logoutUrl("/user/logout").logoutSuccessUrl("/user/login"))
